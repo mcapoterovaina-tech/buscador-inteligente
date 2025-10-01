@@ -1,5 +1,10 @@
 [🔍 Probar el Buscador Inteligente](https://mcapoterovaina-tech.github.io/buscador-inteligente/busqueda-inteligente/buscar.html)
 
+“Este video fue generado con ayuda de NotebookLM para explicar mi propio proyecto de búsqueda inteligente.”
+
+[![Ver el video explicativo](https://i9.ytimg.com/vi/QQXHcnVt28w/mq1.jpg?sqp=CPin9sYG-oaymwEmCMACELQB8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGGUgZShlMA8=&rs=AOn4CLCeXZcbl0_vF14MCM_yu1tcB6uy6Q)](https://youtu.be/QQXHcnVt28w)
+
+
 Informe de Revisión Técnica: Funcionalidad de Búsqueda Inteligente
 
 1.0 Estructura General y Componentes del Sistema
