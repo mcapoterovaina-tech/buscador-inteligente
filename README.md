@@ -41,8 +41,8 @@ La comunicación entre los diferentes módulos de JavaScript (carga, análisis y
 
 Se almacenan dos elementos clave:
 
-1. textoWord: Este ítem es generado por el script de gestión de archivos (arrastre.txt). Contiene una cadena JSON que representa un objeto con el texto crudo extraído del archivo .docx. Actúa como la "fuente de verdad" del contenido del documento, que es consumida por los otros módulos.
-2. analisisWord: Este ítem es el resultado del trabajo del script de análisis (analizar.txt). Este módulo lee textoWord y produce un nuevo objeto que contiene un ID único para el documento y, lo más importante, el diccionario con la frecuencia de cada palabra. Este análisis pre-procesado, almacenado como una cadena JSON, es lo que permite que la búsqueda sea rápida y eficiente.
+1. textoWord: Este ítem es generado por el script de gestión de archivos (arrastre.js). Contiene una cadena JSON que representa un objeto con el texto crudo extraído del archivo .docx. Actúa como la "fuente de verdad" del contenido del documento, que es consumida por los otros módulos.
+2. analisisWord: Este ítem es el resultado del trabajo del script de análisis (analizar.js). Este módulo lee textoWord y produce un nuevo objeto que contiene un ID único para el documento y, lo más importante, el diccionario con la frecuencia de cada palabra. Este análisis pre-procesado, almacenado como una cadena JSON, es lo que permite que la búsqueda sea rápida y eficiente.
 
 2.2 Cadena de Llamadas a Funciones y Eventos
 
@@ -81,7 +81,7 @@ A continuación, se describe la secuencia de eventos que ocurren cuando un usuar
 4. Extracción de Texto: La función utiliza mammoth.js para leer el archivo y extraer su contenido de texto plano de forma asíncrona.
 5. Persistencia Inicial: Una vez extraído, el texto se guarda en localStorage bajo la clave textoWord.
 6. Acción Requerida: Se muestra una alerta nativa del navegador pidiendo al usuario que recargue la página para continuar con el proceso.
-7. Análisis Post-Recarga (analizar.txt): Después de la recarga, el evento DOMContentLoaded es capturado por el script de análisis. Este detecta la existencia de textoWord, lo lee y llama a analizarTexto().
+7. Análisis Post-Recarga (analizar.js): Después de la recarga, el evento DOMContentLoaded es capturado por el script de análisis. Este detecta la existencia de textoWord, lo lee y llama a analizarTexto().
 8. Persistencia del Análisis: El resultado del análisis (el objeto con el ID y las frecuencias de palabras) se guarda en localStorage bajo la clave analisisWord. Simultáneamente, el texto completo del documento se muestra en el elemento tex-bak.
 
 4.2 Escenario 2: Búsqueda de Términos
@@ -134,7 +134,7 @@ Basado en el análisis técnico, este sistema es funcional y demuestra una clara
   * Observación: El flujo de trabajo actual requiere que el usuario recargue la página manualmente después de subir un archivo para que el análisis se ejecute. Este paso es poco intuitivo, interrumpe la experiencia del usuario y puede generar confusión.
   * Sugerencia: Modificar la función manejarArchivo en arrastre.txt. Inmediatamente después de guardar el texto en localStorage con setItem, se debería llamar directamente a la función analizarTexto() pasándole el texto extraído como argumento. Esto encadenaría el proceso de análisis inmediatamente después de la carga, creando una experiencia fluida y sin interrupciones.
 2. Optimizar el Rendimiento de la Búsqueda
-  * Observación: El script de búsqueda (búsqueda.txt) accede y parsea los datos desde localStorage en cada evento input, es decir, con cada pulsación de tecla. Aunque localStorage es rápido, para documentos muy grandes, este acceso repetido puede introducir una latencia perceptible.
+  * Observación: El script de búsqueda (búsqueda.js) accede y parsea los datos desde localStorage en cada evento input, es decir, con cada pulsación de tecla. Aunque localStorage es rápido, para documentos muy grandes, este acceso repetido puede introducir una latencia perceptible.
   * Sugerencia: Al cargar la página (dentro del evento DOMContentLoaded), leer textoWord y analisisWord una sola vez y almacenarlos en variables de JavaScript en memoria. La función del evento input operaría entonces sobre estas variables en caché, lo cual es significativamente más rápido que realizar múltiples lecturas desde el almacenamiento local.
 3. Corregir la Lógica de Resaltado
   * Observación: La línea const textoResaltado = texto.replace(regex, '$1'); en búsqueda.txt es funcionalmente incorrecta para el propósito de resaltar. La sintaxis $1 simplemente reinserta el texto capturado por la expresión regular sin ninguna modificación visual.
