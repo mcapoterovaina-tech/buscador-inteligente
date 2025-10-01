@@ -154,3 +154,8 @@ El propósito de esta sección es explicar el funcionamiento completo del "Busca
 3. Atender una Consulta: Cuando un usuario escribe en la barra de búsqueda, es como si le preguntara al bibliotecario por una palabra específica. El bibliotecario no va a la estantería a buscar el libro y leerlo de nuevo. En su lugar, consulta su ficha de índice, que es mucho más rápida. Al instante, puede ver todas las palabras que coinciden con la búsqueda y, gracias a que contó las repeticiones, sabe cuáles son las más importantes (las más frecuentes).
 4. Mostrar los Resultados: Una vez que el bibliotecario ha encontrado las coincidencias en su índice, va a la estantería, toma el libro original y le pone un marcapáginas de colores en cada lugar donde aparece la palabra buscada. Luego, le entrega el libro al usuario para que pueda ver las palabras resaltadas en su contexto original.
 5. Limpiar la Mesa: Finalmente, el botón "borrar" es como decirle al bibliotecario que la consulta ha terminado. Él retira el libro de la estantería y destruye la ficha de índice, dejando la biblioteca limpia y lista para recibir un nuevo libro.
+
+6. ⚡ Rendimiento probado
+1. Documento: Don Quijote de la Mancha (~2MB de texto)
+2. Búsqueda: todas las palabras que contienen la letra “c”
+3. Tiempo de respuesta: 32 ms (tras carga inicial)
