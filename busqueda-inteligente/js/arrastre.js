@@ -1,32 +1,37 @@
-  const modal = document.getElementById('dropModal');
-  const abrirModal = document.getElementById('abrirModal');
-  const abrirArchivo = document.getElementById('abrirArchivo');
-  const fileInput = document.getElementById('fileInput');
 
-  // Abrir modal con el botón
-  abrirModal.addEventListener('click', () => {
+  const modal = document.getElementById('dropModal');
+  const fileInput = document.getElementById('fileInput');
+  const abrirArchivo = document.getElementById('abrirArchivo');
+
+  // Detectar arrastre de archivo (PC)
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
     modal.classList.add('active');
   });
 
-  // Cerrar modal si haces clic fuera de él
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-    }
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    modal.classList.remove('active');
   });
 
-  //Botón dentro del modal para abrir explorador de archivos
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    modal.classList.remove('active');
+    manejarArchivo(e.dataTransfer.files[0]);
+  });
+
+  // En móviles: abrir explorador al pulsar el botón
   abrirArchivo.addEventListener('click', () => {
     fileInput.click();
   });
 
-  // Procesar archivo seleccionado
+  // Cuando el usuario selecciona un archivo desde el explorador
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     manejarArchivo(file);
   });
 
-  //Función común para procesar archivo
+  // Función común para procesar el archivo
   function manejarArchivo(file) {
     if (file && file.name.endsWith(".docx")) {
       const reader = new FileReader();
@@ -37,12 +42,12 @@
         mammoth.extractRawText({ arrayBuffer })
           .then(result => {
             const texto = result.value;
+
             console.log("Texto extraído del Word:", texto);
 
             localStorage.setItem("textoWord", JSON.stringify({ texto }));
 
-            alert("Texto extraído y guardado en LocalStorage. Recargue la página para verlo.");
-            modal.classList.remove('active'); // cerrar modal al terminar
+            alert("Texto extraído y guardado en LocalStorage. Por favor recargue la página");
           })
           .catch(err => {
             console.error("Error al leer Word:", err);
@@ -51,6 +56,6 @@
 
       reader.readAsArrayBuffer(file);
     } else {
-      alert(" Solo acepto archivos .docx");
+      alert("Por ahora solo acepto archivos .docx");
     }
   }
