@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>buscador-inteligente</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+
+  <div class="search-box">
+    <input id="busqueda-inteligente" type="text" class="search-input" placeholder="Escribe lo que quieras buscar...">
+  </div>
+  <div class="tex-base">
+    <p class="tex-bloks" id="tex-bak"></p>
+  </div>
+
+  <button type="button" class="bto" id="borrar">borrar</button>
+
+<div class="modal" id="dropModal">
+  <p>Suelta tu archivo aquí 📂</p>
+  <!-- Botón para abrir el explorador de archivos -->
+  <button type="button" id="abrirArchivo">Seleccionar archivo</button>
+  <!-- Input oculto que abre el explorador -->
+  <input type="file" id="fileInput" accept=".docx" style="display:none;">
+</div>
+
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+<script src="js/arrastre.js"></script>
+<script src="js/analizar.js"></script>
+<script src="js/búsqueda.js"></script>
+<script src="js/btnBorrar.js"></script>
+</body>
+</html>

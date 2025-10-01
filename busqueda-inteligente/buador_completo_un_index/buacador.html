@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>buscador-inteligente</title>
+  <style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #fff;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  line-height: 1.6;
+}
+
+/* Barra de búsqueda */
+.search-box {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.search-input {
+  padding: 12px 20px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  outline: none;
+  font-size: 16px;
+  width: 320px;
+  max-width: 80%;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #FFD700; /* amarillo */
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  transform: scale(1.05);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: #fff;
+  border: 2px solid #000;
+  width: 320px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  border-radius: 8px;
+}
+
+.modal.active {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal::before {
+  content: "";
+  position: absolute;
+  top: 12px; left: 12px; right: 12px; bottom: 12px;
+  border: 2px dashed #FFD700;
+  border-radius: 6px;
+}
+
+.modal p {
+  z-index: 1;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+.tex-base {
+  width: 60%;
+  max-height: 70%;
+  border: 3px dashed #FFD700;
+  border-radius: 8px;
+  padding: 15px;
+  overflow-y: auto; /* scroll solo si el texto es muy largo */
+  background: #fafafa;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+}
+
+.tex-bloks {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  background: #fff;
+
+  /* Ajustes importantes */
+  white-space: pre-wrap;   /* respeta saltos de línea del texto original */
+  word-wrap: break-word;   /* corta palabras largas si exceden el ancho */
+  overflow-wrap: break-word; /* soporte moderno para cortes de línea */
+}
+
+
+/* Botón */
+.bto {
+  position: absolute;
+  top: 10%;
+  left: 65%;
+  background: #16212b;
+  border: 1px solid #1f2a36;
+  color: #e6eef7;
+  padding: .5rem .9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background .2s, border .2s, transform .2s;
+}
+
+.bto:hover {
+  background: #1a2530; 
+  border-color: #2a3a4a; 
+  transform: translateY(-2px);
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="search-box">
+    <input id="busqueda-inteligente" type="text" class="search-input" placeholder="Escribe lo que quieras buscar...">
+  </div>
+  <div class="tex-base">
+    <p class="tex-bloks" id="tex-bak"></p>
+  </div>
+
+  <button type="button" class="bto" id="borrar">borrar</button>
+
+  <div class="modal" id="dropModal">
+    <p>Suelta tu archivo aquí 📂</p>
+  </div>
+
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+<script>
+  const modal = document.getElementById('dropModal');
+
+  // Detectar arrastre de archivo
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    modal.classList.add('active');
+  });
+
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    modal.classList.remove('active');
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    modal.classList.remove('active');
+
+    const file = e.dataTransfer.files[0];
+
+    if (file && file.name.endsWith(".docx")) {
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const arrayBuffer = event.target.result;
+
+        // Usamos Mammoth.js para extraer el texto del Word
+        mammoth.extractRawText({ arrayBuffer })
+          .then(result => {
+            const texto = result.value; // texto con saltos de línea incluidos
+
+            console.log(" Texto extraído del Word:", texto);
+
+            // Guardar en LocalStorage como JSON
+            localStorage.setItem("textoWord", JSON.stringify({ texto }));
+
+            alert(" Texto extraído y guardado en LocalStorage. por vabor recargue la pagina");
+          })
+          .catch(err => {
+            console.error(" Error al leer Word:", err);
+          });
+      };
+
+      reader.readAsArrayBuffer(file);
+    } else {
+      alert("Por ahora solo acepto archivos .docx");
+    }
+
+  });
+</script>
+<script>
+  // Función para analizar el texto y contar palabras
+  function analizarTexto(texto, docId) {
+    // Normalizamos: quitamos signos y pasamos a minúsculas
+    const palabras = texto
+      .toLowerCase()
+      .replace(/[^\w\sáéíóúñ]/g, "")
+      .split(/\s+/);
+
+    const diccionario = {};
+    palabras.forEach(p => {
+      if (p) {
+        diccionario[p] = (diccionario[p] || 0) + 1;
+      }
+    });
+
+    // Guardamos en localStorage
+    const analisis = {
+      idDocumento: docId,
+      frecuencias: diccionario
+    };
+
+    localStorage.setItem("analisisWord", JSON.stringify(analisis));
+  }
+
+  // Al cargar la página, revisamos si hay texto guardado
+  window.addEventListener("DOMContentLoaded", () => {
+    const data = localStorage.getItem("textoWord");
+
+    if (data) {
+      const { texto } = JSON.parse(data);
+
+      // Renderizar el texto en el div
+      document.getElementById("tex-bak").textContent = texto;
+
+      // Generar un ID único para este documento
+      const docId = "doc-" + Date.now();
+
+      // Analizar y guardar frecuencias
+      analizarTexto(texto, docId);
+
+      console.log(" Análisis guardado en localStorage con ID:", docId);
+    } else {
+      console.log(" No hay texto guardado todavía.");
+    }
+  });
+</script>
+<script>
+  // Escuchar cuando el usuario escribe en la barra de búsqueda
+  document.addEventListener("DOMContentLoaded", () => {
+    const inputBusqueda = document.getElementById("busqueda-inteligente");
+    const texBak = document.getElementById("tex-bak");
+
+    inputBusqueda.addEventListener("input", () => {
+      const query = inputBusqueda.value.trim().toLowerCase();
+
+      // Recuperar texto original y análisis desde localStorage
+      const dataTexto = localStorage.getItem("textoWord");
+      const dataAnalisis = localStorage.getItem("analisisWord");
+
+      if (!dataTexto || !dataAnalisis) {
+        console.log("No hay datos analizados todavía.");
+        return;
+      }
+
+      const { texto } = JSON.parse(dataTexto);
+      const analisis = JSON.parse(dataAnalisis);
+
+      // Si no hay búsqueda, mostrar texto normal
+      if (query === "") {
+        texBak.textContent = texto;
+        return;
+      }
+
+      // Buscar coincidencias en el diccionario
+      const coincidencias = Object.entries(analisis.frecuencias)
+        .filter(([palabra]) => palabra.includes(query))
+        .sort((a, b) => b[1] - a[1]); // ordenar por frecuencia descendente
+
+      console.log("Coincidencias ordenadas por frecuencia:", coincidencias);
+
+      // Resaltar la palabra buscada en el texto
+      const regex = new RegExp(`(${query})`, "gi");
+      const textoResaltado = texto.replace(regex, `<mark>$1</mark>`);
+
+      texBak.innerHTML = textoResaltado;
+    });
+  });
+</script>
+
+<script>
+  // Esperamos a que el DOM esté listo
+  document.addEventListener("DOMContentLoaded", () => {
+    const btnBorrar = document.getElementById("borrar");
+
+    btnBorrar.addEventListener("click", () => {
+      // Borra todo el localStorage
+      localStorage.clear();
+
+      // Mensaje de confirmación
+      alert("Se borraron todos los datos del LocalStorage");
+
+      // Recargar la página automáticamente
+      location.reload();
+    });
+  });
+</script>
+</body>
+</html>
